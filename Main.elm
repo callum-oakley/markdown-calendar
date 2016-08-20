@@ -4,7 +4,7 @@ import Date.Extra
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onClick)
 import Result
 
 
@@ -23,14 +23,21 @@ main =
 type alias Model =
   { from : Result String Date.Date
   , to : Result String Date.Date
+  , calendar : Result String String
   }
 
 
 model : Model
 model =
-  Model
-    (Ok <| Date.Extra.fromCalendarDate 2017 Date.Jan 1)
-    (Ok <| Date.Extra.fromCalendarDate 2018 Date.Jan 1)
+  let
+    from =
+      Ok <| Date.Extra.fromCalendarDate 2017 Date.Jan 1
+
+    to =
+      Ok <| Date.Extra.fromCalendarDate 2018 Date.Jan 1
+
+  in
+    Model from to (Result.map2 Calendar.display from to)
 
 
 
@@ -40,6 +47,7 @@ model =
 type Msg
   = From String
   | To String
+  | Submit
 
 
 update : Msg -> Model -> Model
@@ -51,30 +59,37 @@ update msg model =
     To newTo ->
       { model | to = Date.fromString newTo }
 
+    Submit ->
+      { model | calendar = Result.map2 Calendar.display model.from model.to }
+
 
 
 -- VIEW
 
 
 view : Model -> Html Msg
-view ({ from, to } as model) =
+view ({ from, to, calendar } as model) =
   div []
     [ input [ type' "text", placeholder "from (yyyy-mm-dd)", onInput From ] []
     , input [ type' "text", placeholder "to (yyyy-mm-dd)", onInput To ] []
+    , button [ onClick Submit ] [ text "Submit" ]
     , p [] []
-    , span [ style [ ("white-space", "pre-wrap") ] ] [text (calendarView model)]
+    , calendarView calendar
     ]
 
 
-calendarView : Model -> String
-calendarView { from, to } =
+calendarView : Result String String -> Html Msg
+calendarView calendar =
   let
-    calendarOrErr = Result.map2 Calendar.display from to
+    (content, colour) =
+      case calendar of
+        Ok ok ->
+          (ok, "black")
+
+        Err err ->
+          (err, "red")
 
   in
-    case calendarOrErr of
-      Ok calendar ->
-        calendar
-
-      Err _ ->
-        "Please enter two dates conforming to ISO 8601."
+    span
+      [ style [ ("color", colour), ("white-space", "pre-wrap") ] ]
+      [ text content ]
