@@ -90,6 +90,6 @@ calendarView calendar =
           (err, "red")
 
   in
-    span
-      [ style [ ("color", colour), ("white-space", "pre-wrap") ] ]
-      [ text content ]
+    textarea
+      [ value content, cols 64, rows 50, style [ ("color", colour) ] ]
+      [ ]
