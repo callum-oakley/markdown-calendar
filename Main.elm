@@ -6,6 +6,7 @@ import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
 import Result
+import String
 
 
 main =
@@ -23,6 +24,7 @@ main =
 type alias Model =
   { from : Result String Date.Date
   , to : Result String Date.Date
+  , level : Result String Int
   , calendar : Result String String
   }
 
@@ -36,8 +38,11 @@ model =
     to =
       Ok <| Date.Extra.fromCalendarDate 2018 Date.Jan 1
 
+    level =
+      Ok 2
+
   in
-    Model from to (Result.map2 Calendar.display from to)
+    Model from to level (Result.map3 Calendar.display from to level)
 
 
 
@@ -47,6 +52,7 @@ model =
 type Msg
   = From String
   | To String
+  | Level String
   | Submit
 
 
@@ -59,8 +65,12 @@ update msg model =
     To newTo ->
       { model | to = Date.fromString newTo }
 
+    Level newLevel ->
+      { model | level = String.toInt newLevel }
+
     Submit ->
-      { model | calendar = Result.map2 Calendar.display model.from model.to }
+      { model | calendar =
+        Result.map3 Calendar.display model.from model.to model.level }
 
 
 
@@ -70,8 +80,29 @@ update msg model =
 view : Model -> Html Msg
 view ({ from, to, calendar } as model) =
   div []
-    [ input [ type' "text", placeholder "from (yyyy-mm-dd)", onInput From ] []
-    , input [ type' "text", placeholder "to (yyyy-mm-dd)", onInput To ] []
+    [ label [ for "from" ] [ text " from: " ]
+    , input
+      [ id "from"
+      , type' "text"
+      , placeholder "yyyy-mm-dd"
+      , onInput From
+      ] []
+    , label [ for "to" ] [ text " to: " ]
+    , input
+      [ id "to"
+      , type' "text"
+      , placeholder "yyyy-mm-dd"
+      , onInput To
+      ] []
+    , label [ for "level" ] [ text " header level: " ]
+    , input
+      [ id "level"
+      , type' "number"
+      , placeholder "2"
+      , Html.Attributes.min "1"
+      , Html.Attributes.max "5"
+      , size 20, onInput Level
+      ] []
     , button [ onClick Submit ] [ text "Submit" ]
     , p [] []
     , calendarView calendar

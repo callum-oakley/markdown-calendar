@@ -6,14 +6,15 @@ import Date.Extra
 import List exposing (..)
 import List.Extra
 import Maybe
+import String
 
 
-display : Date.Date -> Date.Date -> String
-display from to =
+display : Date.Date -> Date.Date -> Int -> String
+display from to level =
   Date.Extra.range Date.Extra.Day 1 from to
     |> groupByMonth
-    |> List.map formatGroup
-    |> concatenate
+    |> List.map (formatGroup level)
+    |> concatenate level
 
 
 groupByMonth : List Date.Date -> List (Date.Date, List Date.Date)
@@ -29,19 +30,21 @@ groupByMonth dates =
       |> List.map (\group -> (extractHeader group, group))
 
 
-formatGroup : (Date.Date, List Date.Date) -> (String, List String)
-formatGroup (header, dates) =
+formatGroup : Int -> (Date.Date, List Date.Date) -> (String, List String)
+formatGroup level (header, dates) =
   let
     formatHeader =
-      Date.Extra.toFormattedString "### MMMM y\n\n"
+      Date.Extra.toFormattedString
+        <| String.repeat (level + 1) "#" ++ " MMMM y\n\n"
 
     formatDate =
-      Date.Extra.toFormattedString "#### EEEE ddd MMMM y\n\n"
+      Date.Extra.toFormattedString
+        <| String.repeat (level + 2) "#" ++ " EEEE ddd MMMM y\n\n"
 
   in
     (formatHeader header, List.map formatDate dates)
 
 
-concatenate : List (String, List String) -> String
-concatenate =
-  foldr (\(header, dates) acc -> header ++ foldr (++) "" dates ++ acc) ""
+concatenate : Int -> List (String, List String) -> String
+concatenate level =
+  foldl (\(header, dates) acc -> acc ++ header ++ foldr (++) "" dates) (String.repeat level "#" ++ " Calendar\n\n")
