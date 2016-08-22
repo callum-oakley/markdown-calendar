@@ -80,32 +80,35 @@ update msg model =
 view : Model -> Html Msg
 view ({ from, to, calendar } as model) =
   div []
-    [ label [ for "from" ] [ text " from: " ]
-    , input
-      [ id "from"
-      , type' "text"
-      , placeholder "yyyy-mm-dd"
-      , onInput From
-      ] []
-    , label [ for "to" ] [ text " to: " ]
-    , input
-      [ id "to"
-      , type' "text"
-      , placeholder "yyyy-mm-dd"
-      , onInput To
-      ] []
-    , label [ for "level" ] [ text " header level: " ]
-    , input
-      [ id "level"
-      , type' "number"
-      , placeholder "2"
-      , Html.Attributes.min "1"
-      , Html.Attributes.max "5"
-      , size 20, onInput Level
-      ] []
-    , button [ onClick Submit ] [ text "Submit" ]
-    , p [] []
-    , calendarView calendar
+    [ div []
+      [ label [ for "from" ] [ text " from: " ]
+      , input
+        [ id "from"
+        , type' "text"
+        , placeholder "yyyy-mm-dd"
+        , onInput From
+        ] []
+      , label [ for "to" ] [ text " to: " ]
+      , input
+        [ id "to"
+        , type' "text"
+        , placeholder "yyyy-mm-dd"
+        , onInput To
+        ] []
+      , label [ for "level" ] [ text " header level: " ]
+      , input
+        [ id "level"
+        , type' "number"
+        , placeholder "2"
+        , Html.Attributes.min "1"
+        , Html.Attributes.max "5"
+        , size 20, onInput Level
+        ] []
+      , button [ onClick Submit ] [ text "Submit" ]
+      ]
+    , div []
+      [ calendarView calendar
+      ]
     ]
 
 

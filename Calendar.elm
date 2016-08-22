@@ -3,6 +3,7 @@ module Calendar exposing (display)
 
 import Date
 import Date.Extra
+import Date.Extra.Facts
 import List exposing (..)
 import List.Extra
 import Maybe
@@ -35,16 +36,51 @@ formatGroup level (header, dates) =
   let
     formatHeader =
       Date.Extra.toFormattedString
-        <| String.repeat (level + 1) "#" ++ " MMMM y\n\n"
+        <| String.repeat (level + 1) "#" ++ " MMMM y\n"
+
+    monthOverview' =
+      monthOverview (Date.year header) (Date.month header)
 
     formatDate =
       Date.Extra.toFormattedString
         <| String.repeat (level + 2) "#" ++ " EEEE ddd MMMM y\n\n"
 
   in
-    (formatHeader header, List.map formatDate dates)
+    (formatHeader header ++ monthOverview', List.map formatDate dates)
+
+
+monthOverview : Int -> Date.Month -> String
+monthOverview year month =
+  let
+    weekdayNumber =
+      Date.Extra.weekdayNumber <| Date.Extra.fromCalendarDate year month 1
+
+    daysInMonth =
+      Date.Extra.Facts.daysInMonth year month
+
+    template =
+      List.Extra.greedyGroupsOf 7
+        <| repeat (weekdayNumber - 1) 0 ++ [1..daysInMonth]
+
+    showDay day =
+      if day == 0 then
+        "  "
+      else if day < 10 then
+        " " ++ toString day
+      else
+        toString day
+
+    showWeek =
+        flip (++) "\n"  << String.concat << intersperse " " << map showDay
+
+    showMonth =
+      String.concat << map showWeek
+  in
+    "```\nMo Tu We Th Fr Sa Su\n" ++ showMonth template ++ "```\n\n"
 
 
 concatenate : Int -> List (String, List String) -> String
 concatenate level =
-  foldl (\(header, dates) acc -> acc ++ header ++ foldr (++) "" dates) (String.repeat level "#" ++ " Calendar\n\n")
+  foldl
+    (\(header, dates) acc -> acc ++ header ++ foldr (++) "" dates)
+    (String.repeat level "#" ++ " Calendar\n\n")
