@@ -91,4 +91,4 @@ concatenate : Int -> List (String, List String) -> String
 concatenate level =
   foldl
     (\(header, days) acc -> acc ++ header ++ foldr (++) "" days)
-    (String.repeat level "#" ++ " Calendar\n\n")
+    (String.repeat level "#" ++ " Calendar\n")
