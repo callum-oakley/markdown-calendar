@@ -137,12 +137,11 @@ view ({ from, to, calendar } as model) =
       , div [ class "checkbox" ]
         [ label []
         [ input
-          [ id "days"
-          , type' "checkbox"
+          [ type' "checkbox"
           , checked False
           , onCheck IncludeDays
           ] []
-          , text "Include days"
+          , text " Include days "
           ]
 
         ]
