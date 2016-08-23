@@ -1,0 +1,34 @@
+body, html, body > div
+  { height: 100%
+  }
+
+.wrapper
+  { height: 100%
+  ; display: flex
+  ; flex-direction: column
+  }
+
+.header
+  { margin: 10px
+  }
+
+.calendar
+  { margin: 10px
+  ; display: flex
+  ; flex-direction: column
+  ; flex: auto
+  }
+
+label, .checkbox > label > input
+  { margin-left: 5px
+  ; margin-right: 5px
+  }
+
+input
+  { font-family: monospace
+  }
+
+textarea
+  { font-family: monospace
+  ; flex: auto
+  }

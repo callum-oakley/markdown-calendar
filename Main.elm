@@ -93,48 +93,64 @@ update msg ({ from, to, level, includeDays } as model) =
 
 view : Model -> Html Msg
 view ({ from, to, calendar } as model) =
-  div []
-    [ div []
-      [ label [ for "from" ] [ text " from: " ]
-      , input
-        [ id "from"
-        , type' "text"
-        , placeholder "yyyy-mm-dd"
-        , onInput From
-        ] []
+  div [ class "wrapper" ]
+    [ div [ class "form-inline header" ]
+      [ div [ class "form-group" ]
+        [ label [ for "from" ] [ text "From" ]
+        , input
+          [ id "from"
+          , class "form-control"
+          , type' "text"
+          , placeholder "yyyy-mm-dd"
+          , onInput From
+          ] []
 
-      , label [ for "to" ] [ text " to: " ]
-      , input
-        [ id "to"
-        , type' "text"
-        , placeholder "yyyy-mm-dd"
-        , onInput To
-        ] []
+        ]
 
-      , label [ for "level" ] [ text " header level: " ]
-      , input
-        [ id "level"
-        , type' "number"
-        , placeholder "2"
-        , Html.Attributes.min "1"
-        , Html.Attributes.max "5"
-        , size 20
-        , onInput Level
-        ] []
+      , div [ class "form-group" ]
+        [ label [ for "to" ] [ text "To" ]
+        , input
+          [ id "to"
+          , class "form-control"
+          , type' "text"
+          , placeholder "yyyy-mm-dd"
+          , onInput To
+          ] []
 
-      , label [ for "days" ] [ text " include days: " ]
-      , input
-        [ id "days"
-        , type' "checkbox"
-        , checked False
-        , onCheck IncludeDays
-        ] []
+        ]
 
-      , button [ onClick Submit ] [ text "Submit" ]
+      , div [ class "form-group" ]
+        [ label [ for "level" ] [ text "Header level" ]
+        , input
+          [ id "level"
+          , class "form-control"
+          , type' "number"
+          , placeholder "2"
+          , Html.Attributes.min "1"
+          , Html.Attributes.max "5"
+          , size 20
+          , onInput Level
+          ] []
 
+        ]
+
+      , div [ class "checkbox" ]
+        [ label []
+        [ input
+          [ id "days"
+          , type' "checkbox"
+          , checked False
+          , onCheck IncludeDays
+          ] []
+          , text "Include days"
+          ]
+
+        ]
+
+      , button [ class "btn btn-default", onClick Submit ] [ text "Submit" ]
       ]
 
-    , div []
+    , div [ class "calendar"]
       [ calendarView calendar
       ]
 
@@ -154,4 +170,8 @@ calendarView calendar =
 
   in
     textarea
-      [ value content, cols 64, rows 50, style [ ("color", colour) ] ] []
+      [ value content
+      , readonly True
+      , class "form-control"
+      , style [ ("color", colour) ]
+      ] []
