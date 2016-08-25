@@ -7,13 +7,15 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, onCheck)
 import Result
 import String
+import Task
 
 
 main =
-  App.beginnerProgram
-    { model = model
+  App.program
+    { init = init
     , view = view
     , update = update
+    , subscriptions = subscriptions
     }
 
 
@@ -30,14 +32,14 @@ type alias Model =
   }
 
 
-model : Model
-model =
+init : (Model, Cmd Msg)
+init =
   let
     from =
-      Ok <| Date.Extra.fromCalendarDate 2017 Date.Jan 1
+      Err ""
 
     to =
-      Ok <| Date.Extra.fromCalendarDate 2018 Date.Jan 1
+      Err ""
 
     level =
       Ok 2
@@ -45,13 +47,16 @@ model =
     includeDays =
       False
 
+    model =
+      Model
+        from
+        to
+        level
+        includeDays
+        (Result.map3 (Calendar.display includeDays) from to level)
+
   in
-    Model
-      from
-      to
-      level
-      includeDays
-      (Result.map3 (Calendar.display includeDays) from to level)
+    (model, Task.perform (\_ -> NoOp) CurrentDate Date.now)
 
 
 
@@ -64,27 +69,77 @@ type Msg
   | Level String
   | IncludeDays Bool
   | Submit
+  | CurrentDate Date.Date
+  | NoOp
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg ({ from, to, level, includeDays } as model) =
   case msg of
     From newFrom ->
-      { model | from = Date.fromString newFrom }
+      ( { model | from = Date.fromString newFrom }
+      , Cmd.none
+      )
 
     To newTo ->
-      { model | to = Date.fromString newTo }
+      ( { model | to = Date.fromString newTo }
+      , Cmd.none
+      )
 
     Level newLevel ->
-      { model | level = String.toInt newLevel }
+      ( { model | level = String.toInt newLevel }
+      , Cmd.none
+      )
 
     IncludeDays checked ->
-      { model | includeDays = checked }
+      ( { model | includeDays = checked }
+      , Cmd.none
+      )
 
     Submit ->
-      { model | calendar =
-          Result.map3 (Calendar.display includeDays) from to level
-      }
+      ( { model | calendar = updateCalendar from to level includeDays }
+      , Cmd.none
+      )
+
+    CurrentDate date ->
+      let
+        newFrom =
+          Ok <| date
+
+        newTo =
+          Ok <| Date.Extra.add Date.Extra.Year 2 date
+
+        newCalendar =
+          updateCalendar newFrom newTo level includeDays
+
+      in
+        ( { model | from = newFrom, to = newTo, calendar = newCalendar }
+        , Cmd.none
+        )
+
+    NoOp ->
+      ( model
+      , Cmd.none
+      )
+
+
+updateCalendar
+  :  Result String Date.Date
+  -> Result String Date.Date
+  -> Result String Int
+  -> Bool
+  -> Result String String
+updateCalendar from to level includeDays =
+  Result.map3 (Calendar.display includeDays) from to level
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions :  Model -> Sub Msg
+subscriptions model =
+  Sub.none
 
 
 
