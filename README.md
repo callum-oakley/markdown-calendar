@@ -7,6 +7,8 @@ Dates must be in the format `yyyy-mm-dd`.
 
 Check *Include days* if you want to fill your calendar out with blank entries for each day, or leave it unchecked if you would rather fill in days manually as needed.
 
+![](screen-shot.png)
+
 ## Building
 Assuming you have elm and bower installed. Clone and run
 
