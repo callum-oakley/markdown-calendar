@@ -56,7 +56,7 @@ init =
         (Result.map3 (Calendar.display includeDays) from to level)
 
   in
-    (model, Task.perform (\_ -> NoOp) CurrentDate Date.now)
+    (model, Task.perform (always NoOp) CurrentDate Date.now)
 
 
 

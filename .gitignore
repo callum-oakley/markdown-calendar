@@ -1,3 +1,4 @@
 elm-stuff
 bower_components
 *.js
+.DS_Store
